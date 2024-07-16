@@ -52,11 +52,15 @@ RUN set -ex \
         iputils-ping \
         telnet \
     && echo 'de_DE.UTF-8 UTF-8' > /etc/locale.gen \
-    && locale-gen de_DE.UTF-8 \
+    && locale-gen \
     && update-locale LANG=de_DE.UTF-8 LC_ALL=de_DE.UTF-8 \
+    # Ensure locales are properly set
+    && dpkg-reconfigure --frontend=noninteractive locales \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
     && pip install -U pip setuptools wheel \
     && pip install pytz pyOpenSSL ndg-httpsclient pyasn1 \
+    # Temporarily install a compatible version of pip for Celery to avoid version issues
+    && pip install "pip<24.1" \
     && pip install -r requirements.txt \
     && pip install --use-feature=2020-resolver apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis>=2.10.5,<3' \
