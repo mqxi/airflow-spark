@@ -7,8 +7,8 @@
 FROM python:3.9-buster
 
 # Never prompts the user for choices on installation/configuration of packages
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TERM=linux
+ENV DEBIAN_FRONTEND noninteractive
+ENV TERM linux
 
 # Airflow
 ARG AIRFLOW_VERSION=1.10.7
@@ -17,7 +17,7 @@ ARG AIRFLOW_DEPS=""
 ARG PYTHON_DEPS=""
 ARG SPARK_VERSION="3.1.2"
 ARG HADOOP_VERSION="3.2"
-ENV AIRFLOW_GPL_UNIDECODE=yes
+ENV AIRFLOW_GPL_UNIDECODE yes
 
 # Define Locale to de_DE
 ENV LANGUAGE=de_DE.UTF-8
@@ -59,17 +59,16 @@ RUN set -ex \
     && useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow \
     && pip install -U pip setuptools wheel \
     && pip install pytz pyOpenSSL ndg-httpsclient pyasn1 \
-    # Temporarily install a compatible version of pip for Celery to avoid version issues
     && pip install "pip<24.1" \
     && pip install -r requirements.txt \
-    && pip install --use-feature=2020-resolver apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
+    && pip install apache-airflow[crypto,celery,postgres,hive,jdbc,mysql,ssh${AIRFLOW_DEPS:+,}${AIRFLOW_DEPS}]==${AIRFLOW_VERSION} \
     && pip install 'redis>=2.10.5,<3' \
     && if [ -n "${PYTHON_DEPS}" ]; then pip install ${PYTHON_DEPS}; fi \
     && apt-get purge --auto-remove -yqq $buildDeps \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/man /usr/share/doc /usr/share/doc-base
-    
+
 RUN python --version && pip freeze
 
 ###############################
@@ -83,7 +82,7 @@ RUN set -ex \
     && apt-get install -y openjdk-8-jdk \
     && java -version \
     && javac -version
-
+    
 ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
 ###############################
